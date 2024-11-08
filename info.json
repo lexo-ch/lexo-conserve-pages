@@ -1,0 +1,20 @@
+{
+    "name": "LEXO Conserve Pages",
+    "slug": "lexo-conserve-pages",
+    "author": "<a href='https://www.lexo.ch/'>LEXO GmbH</a>",
+    "author_profile": "https://github.com/lexo-ch/",
+    "donate_link": "https://www.lexo.ch/",
+    "version": "1.0.0",
+    "download_url": "https://github.com/lexo-ch/lexo-conserve-pages/releases/download/v1.0.0/lexo-conserve-pages-1.0.0.zip",
+    "requires": "4.7",
+    "tested": "6.6.2",
+    "requires_php": "7.4.1",
+    "sections": {
+        "description": "Groups marked pages.<br><a href='https://github.com/lexo-ch/lexo-conserve-pages/' target='_blank'>More about plugin</a>",
+        "changelog": "Click <a href='https://github.com/lexo-ch/lexo-conserve-pages/releases/latest/' target='_blank'>here</a> to see changelog."
+    },
+    "banners": {
+        "low": "https://raw.githubusercontent.com/lexo-ch/lexo-conserve-pages/master/banners/banner-1544x500.webp",
+        "high": "https://raw.githubusercontent.com/lexo-ch/lexo-conserve-pages/master/banners/banner-1544x500.webp"
+    }
+}
