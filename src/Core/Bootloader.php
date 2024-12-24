@@ -5,6 +5,7 @@ namespace LEXO\CP\Core;
 use LEXO\CP\Core\Abstracts\Singleton;
 use LEXO\CP\Core\Plugin\PluginService;
 use LEXO\CP\Core\Notices\Notices;
+use LEXO\CP\Core\Plugin\Conserver;
 
 use const LEXO\CP\{
     DOMAIN,
@@ -22,6 +23,12 @@ class Bootloader extends Singleton
         add_action(DOMAIN . '/localize/admin-cp.js', [$this, 'onAdminCpJsLoad']);
         add_action('after_setup_theme', [$this, 'onAfterSetupTheme']);
         add_action('admin_init', [$this, 'onAdminInit'], 10);
+        add_filter('manage_pages_columns', [$this, 'addConservePageColumn']);
+        add_action('manage_pages_custom_column', [$this, 'displayConservePageCheckbox'], 10, 2);
+        add_action('wp_ajax_toggle_conserve_page', [$this, 'toggleConservePageStatus']);
+        add_action('parse_query', [$this, 'filterConservePageQuery']);
+        add_action('save_post', [$this, 'setConservePageForChild'], 10, 3);
+        add_filter('views_edit-page', [$this, 'filterPageCount'], 10, 1);
     }
 
     public function onAdminInit()
@@ -57,5 +64,35 @@ class Bootloader extends Singleton
     public function loadPluginTextdomain()
     {
         load_plugin_textdomain(DOMAIN, false, trailingslashit(trailingslashit(basename(PATH)) . LOCALES));
+    }
+
+    public function addConservePageColumn($columns)
+    {
+        return Conserver::handleAddConservePageColumn($columns);
+    }
+
+    public function displayConservePageCheckbox($column, $post_id)
+    {
+        return Conserver::handleDisplayConservePageCheckbox($column, $post_id);
+    }
+
+    public function toggleConservePageStatus()
+    {
+        Conserver::handleToggleConservePageStatus();
+    }
+
+    public function setConservePageForChild($post_id, $post, $update)
+    {
+        return Conserver::handleSetConservePageForChild($post_id, $post, $update);
+    }
+
+    public function filterConservePageQuery($query)
+    {
+        Conserver::handleFilterConservePageQuery($query);
+    }
+
+    public function filterPageCount($views)
+    {
+        return Conserver::handleFilterPageCount($views);
     }
 }

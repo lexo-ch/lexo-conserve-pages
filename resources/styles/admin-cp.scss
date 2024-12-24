@@ -3,5 +3,41 @@
  */
 
 body {
-    background-color: red !important;
+}
+.subsubsub.conserve-loading {
+    pointer-events: none;
+}
+#posts-filter.conserve-loading {
+    position: relative;
+    pointer-events: none;
+}
+#posts-filter.conserve-loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 999;
+}
+#posts-filter.conserve-loading::after {
+    content: '';
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 4px solid #e5e5e5;
+    border-right-color: #007cba;
+    animation: spiner 1s infinite linear;
+    z-index: 1000;
+}
+@keyframes spiner {
+    to {
+        transform: translateX(-50%) rotate(1turn);
+    }
 }
