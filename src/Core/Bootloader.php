@@ -22,18 +22,13 @@ class Bootloader extends Singleton
         add_action('init', [$this, 'onInit'], 10);
         add_action(DOMAIN . '/localize/admin-cp.js', [$this, 'onAdminCpJsLoad']);
         add_action('after_setup_theme', [$this, 'onAfterSetupTheme']);
-        add_action('admin_init', [$this, 'onAdminInit'], 10);
         add_filter('manage_pages_columns', [$this, 'addConservePageColumn']);
         add_action('manage_pages_custom_column', [$this, 'displayConservePageCheckbox'], 10, 2);
         add_action('wp_ajax_toggle_conserve_page', [$this, 'toggleConservePageStatus']);
         add_action('parse_query', [$this, 'filterConservePageQuery']);
         add_action('save_post', [$this, 'setConservePageForChild'], 10, 3);
         add_filter('views_edit-page', [$this, 'filterPageCount'], 10, 1);
-    }
-
-    public function onAdminInit()
-    {
-        $plugin_settings = PluginService::getInstance();
+        add_filter('post_class', [$this, 'applyCustomClassToConvertedPages'], 10, 3);
     }
 
     public function onInit()
@@ -73,7 +68,7 @@ class Bootloader extends Singleton
 
     public function displayConservePageCheckbox($column, $post_id)
     {
-        return Conserver::handleDisplayConservePageCheckbox($column, $post_id);
+        Conserver::handleDisplayConservePageCheckbox($column, $post_id);
     }
 
     public function toggleConservePageStatus()
@@ -83,7 +78,7 @@ class Bootloader extends Singleton
 
     public function setConservePageForChild($post_id, $post, $update)
     {
-        return Conserver::handleSetConservePageForChild($post_id, $post, $update);
+        Conserver::handleSetConservePageForChild($post_id, $post, $update);
     }
 
     public function filterConservePageQuery($query)
@@ -94,5 +89,10 @@ class Bootloader extends Singleton
     public function filterPageCount($views)
     {
         return Conserver::handleFilterPageCount($views);
+    }
+
+    public function applyCustomClassToConvertedPages($classes, $class, $post_id)
+    {
+        return Conserver::applyCustomClassToConvertedPages($classes, $class, $post_id);
     }
 }

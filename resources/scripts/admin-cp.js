@@ -2,8 +2,6 @@
  * Admin .js file
  */
 
-const body = document.querySelector('body');
-
 const ajaxWrapper = async (parameters = {}) => {
 
     const data = new FormData();
@@ -42,19 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-window.onload = () => {
-};
-
-
-window.onresize = () => {
-
-};
-
-
-window.onscroll = () => {
-
-};
-
 const conservePage = (checkbox) => {
     const postId = checkbox.dataset.postId;
 
@@ -62,25 +47,21 @@ const conservePage = (checkbox) => {
         return;
     }
 
-    const pageList = document.getElementById('posts-filter');
-    const filterList = document.querySelectorAll('.subsubsub');
+    const pageList = document.getElementById('the-list');
 
     if (pageList) {
         pageList.classList.add('conserve-loading');
     }
 
-    filterList.forEach(el => el.classList.add('conserve-loading'));
-
-
     ajaxWrapper({
         action: 'toggle_conserve_page',
         post_id: postId,
         is_conserved: checkbox.checked
-    })
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            }
-        })
-        .catch(error => console.error(error));
+    }).then(data => {
+        if (data.success) {
+            location.reload();
+        } else if (pageList) {
+            pageList.classList.remove('conserve-loading');
+        }
+    }).catch(error => console.error(error));
 };

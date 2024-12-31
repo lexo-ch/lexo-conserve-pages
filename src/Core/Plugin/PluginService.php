@@ -82,7 +82,6 @@ class PluginService extends Singleton
         return $links;
     }
 
-
     public function updater()
     {
         return (new PluginUpdater())
