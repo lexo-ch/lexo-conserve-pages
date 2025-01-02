@@ -1,0 +1,61 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: LEXO Conserve Pages\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-02 14:09+0000\n"
+"PO-Revision-Date: 2025-01-02 14:15+0000\n"
+"Last-Translator: \n"
+"Language-Team: German\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.14; wp-6.7.1\n"
+"X-Domain: cp"
+
+#: ../../../../../../../Documents/GitHub/lexo-conserve-pages/src/Core/Plugin/Conserver.php:142
+msgid "All excl. Conserved"
+msgstr "Alle exkl. Konservierte"
+
+#: ../../../../../../../Documents/GitHub/lexo-conserve-pages/src/Core/Plugin/Conserver.php:156
+msgid "All incl. Conserved"
+msgstr "Alle inkl. Konservierte"
+
+#: ../../../../../../../Documents/GitHub/lexo-conserve-pages/src/Core/Plugin/Conserver.php:34
+msgid "Conserve Page"
+msgstr "Seite konservieren"
+
+#. Description of the plugin
+msgid "Groups marked pages."
+msgstr "Gruppiert markierte Seiten."
+
+#. URI of the plugin
+msgid "https://github.com/lexo-ch/lexo-conserve-pages/"
+msgstr "https://github.com/lexo-ch/lexo-conserve-pages/"
+
+#. Author URI of the plugin
+msgid "https://www.lexo.ch"
+msgstr "https://www.lexo.ch"
+
+#. Name of the plugin
+msgid "LEXO Conserve Pages"
+msgstr "LEXO Conserve Pages"
+
+#. Author of the plugin
+msgid "LEXO GmbH"
+msgstr "LEXO GmbH"
+
+#: ../../../../../../../Documents/GitHub/lexo-conserve-pages/src/Core/Plugin/PluginService.php:109
+#, php-format
+msgid "Plugin %s is up to date."
+msgstr "Plugin %s ist aktuell."
+
+#: ../../../../../../../Documents/GitHub/lexo-conserve-pages/src/Core/Plugin/PluginService.php:100
+msgid "Security check failed."
+msgstr "Sicherheitsüberprüfung fehlgeschlagen."
+
+#: ../../../../../../../Documents/GitHub/lexo-conserve-pages/src/Core/Plugin/PluginService.php:75
+msgid "Update check"
+msgstr "Update Überprüfung"
