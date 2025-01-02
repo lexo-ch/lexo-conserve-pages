@@ -1,5 +1,5 @@
 # LEXO Conserve Pages
-Groups marked pages.
+Groups marked pages and their descendants.
 
 ---
 ## Versioning
