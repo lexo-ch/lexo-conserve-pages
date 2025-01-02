@@ -2,13 +2,25 @@
 
 namespace LEXO\CP\Core\Plugin;
 
+use WP_Query;
+
+use const LEXO\CP\{
+    DOMAIN
+};
+
 class Conserver
 {
     private const META_KEY = '_conserve_page';
+    private array $exclude_pages = [];
 
-    public static function applyCustomClassToConvertedPages($classes, $class, $post_id)
+    public function __construct()
     {
-        $is_page_conserved = self::isPageConserved($post_id);
+        $this->exclude_pages = apply_filters(DOMAIN . 'exclude-pages', []);
+    }
+
+    public function applyCustomClassToConvertedPages(array $classes, array $css_class, int $post_id): array
+    {
+        $is_page_conserved = $this->isPageConserved($post_id);
 
         if ($is_page_conserved) {
             $classes[] = 'conserved-page-row';
@@ -17,42 +29,40 @@ class Conserver
         return $classes;
     }
 
-    public static function handleAddConservePageColumn($columns)
+    public function addConservePageColumn(array $posts_columns): array
     {
-        $columns['conserve_page'] = __('Conserve Page', 'cp');
-        return $columns;
+        $posts_columns['conserve_page'] = __('Conserve Page', 'cp');
+        return $posts_columns;
     }
 
-    public static function handleDisplayConservePageCheckbox($column, $post_id)
+    public function displayConservePageCheckbox(string $column_name, int $post_id): void
     {
-        if ($column !== 'conserve_page') {
+        if ($column_name !== 'conserve_page') {
             return;
         }
 
-        $show_checkbox_on_every_top_level = apply_filters('show_conserve_page_checkbox_on_every_top_level', false);
-        $top_level_page_with_checkbox = apply_filters('exclude_conserve_page_checkbox', []);
-        $parent_id = wp_get_post_parent_id($post_id);
-        $is_page_conserved = self::isPageConserved($post_id);
-
-        if (
-            $parent_id === 0
-            && !in_array($post_id, $top_level_page_with_checkbox)
-            && !$show_checkbox_on_every_top_level
-        ) {
+        if (in_array($post_id, $this->exclude_pages)) {
             return;
         }
+
+        $is_page_conserved = $this->isPageConserved($post_id);
 
         ob_start(); ?>
             <input
                 type="checkbox"
                 class="conserve-page-checkbox"
+                id="conserve-page-checkbox-<?php echo esc_attr($post_id); ?>"
                 data-post-id="<?php echo esc_attr($post_id); ?>"
                 <?php checked($is_page_conserved, true); ?>
             />
+            <label
+                for="conserve-page-checkbox-<?php echo esc_attr($post_id); ?>"
+                class="conserve-page-checkbox-label"
+            ></label>
         <?php echo ob_get_clean();
     }
 
-    public static function handleToggleConservePageStatus()
+    public function toggleConservePageStatus(): void
     {
         if (
             !isset($_POST['post_id'])
@@ -63,132 +73,70 @@ class Conserver
             wp_send_json_error();
         }
 
-        $post_id = intval($_POST['post_id']);
-        $is_conserved = $_POST['is_conserved'] === 'true';
+        $post_id = intval(sanitize_text_field($_POST['post_id']));
+        $is_conserved = sanitize_text_field($_POST['is_conserved']) === 'true';
 
-        self::updateConservePageMeta($post_id, $is_conserved);
+        $this->updateConservePageMeta($post_id, $is_conserved);
         wp_send_json_success();
     }
 
-    public static function handleSetConservePageForChild($post_id, $post, $update)
+    private function isPageConserved(int $post_id): bool
     {
-        if ($post->post_type !== 'page') {
-            return;
-        }
-
-        if ($post->post_parent === 0) {
-            delete_post_meta($post_id, self::META_KEY);
-
-            return;
-        }
-
-        $is_parent_conserved = get_post_meta($post->post_parent, self::META_KEY, true);
-
-        if ($is_parent_conserved === 'true') {
-            update_post_meta($post_id, self::META_KEY, 'true');
-
-            return;
-        }
-
-        delete_post_meta($post_id, self::META_KEY);
+        return get_post_meta($post_id, self::META_KEY, true) === 'true';
     }
 
-    public static function handleFilterConservePageQuery($query)
+    private function updateConservePageMeta(int $post_id, bool $is_conserved): void
     {
-        if (!is_admin() || !$query->is_main_query()) {
-            return;
+        do_action(DOMAIN . '/before-conserving-pages');
+
+        $is_conserved
+            ? update_post_meta($post_id, self::META_KEY, 'true')
+            : delete_post_meta($post_id, self::META_KEY);
+
+        $child_pages = get_pages([
+            'child_of'  => $post_id,
+            'post_type' => 'page',
+            'exclude'   => $this->exclude_pages
+        ]);
+
+        foreach ($child_pages as $child_page) {
+            $is_conserved
+                ? update_post_meta($child_page->ID, self::META_KEY, 'true')
+                : delete_post_meta($child_page->ID, self::META_KEY);
         }
 
-        if (self::isSearchForConservedPages()) {
-            self::handleSearchConservedPages($query);
-        }
-
-        if (
-            (isset($_GET['post_type']) && $_GET['post_type'] === 'page' && count($_GET) === 1) ||
-            (isset($_GET['post_type']) && $_GET['post_type'] === 'page' && isset($_GET['all_posts']) && $_GET['all_posts'] === '1')
-        ) {
-            self::handleConservedPagesMetaQuery($query);
-        }
+        do_action(DOMAIN . '/after-conserving-pages');
     }
 
-    private static function isSearchForConservedPages()
+    public function filterPageCount(array $views): array
     {
-        $referer = $_SERVER['HTTP_REFERER'] ?? '';
-        $query = parse_url($referer, PHP_URL_QUERY);
-
-        if (empty($referer) || $query) {
-            return false;
-        }
-
-        parse_str($query, $params);
-
-        return isset($params['conserved_pages']) && $params['conserved_pages'] === '1';
-    }
-
-
-    private static function handleSearchConservedPages($query)
-    {
-        $meta_query = [
-            'relation' => 'AND',
-            [
-                'key' => self::META_KEY,
-                'value' => 'true',
-                'compare' => '='
-            ]
-        ];
-
-        if (isset($_GET['s']) && !empty($_GET['s'])) {
-            $query->set('s', sanitize_text_field($_GET['s']));
-        }
-
-        $query->set('suppress_filters', true);
-        $query->set('meta_query', $meta_query);
-    }
-
-    private static function handleConservedPagesMetaQuery($query)
-    {
-        $meta_query = [
-            'relation' => 'OR',
-            [
-                'key' => self::META_KEY,
-                'compare' => 'NOT EXISTS',
-            ],
-            [
-                'key' => self::META_KEY,
-                'value' => 'true',
-                'compare' => '!=',
-            ],
-        ];
-
-        $query->set('meta_query', $meta_query);
-    }
-
-    public static function handleFilterPageCount($views)
-    {
-        $page_counts = self::getPageCounts();
+        $page_counts = $this->getPageCounts();
 
         $conserved_pages = $page_counts['conserved'];
         $not_conserved_pages = $page_counts['not_conserved'];
 
-        $current_url = $_SERVER['REQUEST_URI'];
-        $parsed_url = parse_url($current_url);
-        $query = $parsed_url['query'] ?? '';
+        $query = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
 
         $is_all_posts = (
             $query === 'post_type=page&all_posts=1' ||
             $query === 'post_type=page'
         );
 
-        $is_conserved_filter_active = (
-            isset($_GET['conserved_pages']) &&
-            $_GET['conserved_pages'] === '1'
-        );
-
         $class_all_posts = $is_all_posts ? 'current' : '';
-        $class_conserved_pages = $is_conserved_filter_active ? 'current' : '';
+
+        $class_conserved_pages = (
+            isset($_GET['conserved_pages'])
+            && $_GET['conserved_pages'] === '1'
+        )
+        || (
+            $this->isSearchForConservedPages()
+            && isset($_GET['s'])
+        )
+            ? 'current'
+            : '';
 
         $views['all'] = sprintf(
-            '<a href="%s" class="%s" aria-current="page">%s (%d)</a>',
+            '<a href="%s" class="%s" aria-current="page">%s <span class="count">(%d)</span></a>',
             'edit.php?post_type=page&all_posts=1',
             esc_attr($class_all_posts),
             __('All excl. Conserved', 'cp'),
@@ -202,7 +150,7 @@ class Conserver
 
             if ($key === 'all') {
                 $new_views['conserved_pages'] = sprintf(
-                    '<a href="%s" class="%s">%s (%d)</a>',
+                    '<a href="%s" class="%s">%s <span class="count">(%d)</span></a>',
                     'edit.php?post_type=page&conserved_pages=1',
                     esc_attr($class_conserved_pages),
                     __('All incl. Conserved', 'cp'),
@@ -214,7 +162,7 @@ class Conserver
         return $new_views;
     }
 
-    private static function getPageCounts()
+    private function getPageCounts(): array
     {
         global $wpdb;
 
@@ -236,29 +184,86 @@ class Conserver
         ];
     }
 
-    private static function isPageConserved($post_id)
+    public function filterConservePageQuery(WP_Query $query): void
     {
-        return get_post_meta($post_id, self::META_KEY, true) === 'true';
+        if (!is_admin() || !$query->is_main_query()) {
+            return;
+        }
+
+        if ($this->isSearchForConservedPages()) {
+            $this->handleSearchConservedPages($query);
+        }
+
+        if (
+            (
+                isset($_GET['post_type'])
+                && $_GET['post_type'] === 'page'
+                && count($_GET) === 1
+            )
+            || (
+                isset($_GET['post_type'])
+                && $_GET['post_type'] === 'page'
+                && isset($_GET['all_posts'])
+                && $_GET['all_posts'] === '1'
+            )
+        ) {
+            $this->handleConservedPagesMetaQuery($query);
+        }
     }
 
-    private static function updateConservePageMeta($post_id, $is_conserved)
+    private function handleConservedPagesMetaQuery(WP_Query $query): void
     {
-        if ($is_conserved) {
-            update_post_meta($post_id, self::META_KEY, 'true');
-        } else {
-            delete_post_meta($post_id, self::META_KEY);
+        $meta_query = [
+            'relation' => 'OR',
+            [
+                'key' => self::META_KEY,
+                'compare' => 'NOT EXISTS',
+            ],
+            [
+                'key' => self::META_KEY,
+                'value' => 'true',
+                'compare' => '!=',
+            ],
+        ];
+
+        $query->set('meta_query', $meta_query);
+    }
+
+    private function isSearchForConservedPages(): bool
+    {
+        if (empty($_SERVER['HTTP_REFERER'])) {
+            return false;
         }
 
-        $child_pages = get_pages([
-            'child_of' => $post_id,
-            'post_type' => 'page',
-            'fields' => 'ids',
-        ]);
+        $referer = filter_var($_SERVER['HTTP_REFERER'], FILTER_SANITIZE_URL);
 
-        foreach ($child_pages as $child_id) {
-            $is_conserved
-                ? update_post_meta($child_id->ID, self::META_KEY, 'true')
-                : delete_post_meta($child_id->ID, self::META_KEY);
+        if (!$referer) {
+            return false;
         }
+
+        $query = parse_url($referer, PHP_URL_QUERY);
+
+        if (empty($query)) {
+            return false;
+        }
+
+        parse_str($query, $params);
+
+        return isset($params['conserved_pages']) && $params['conserved_pages'] === '1';
+    }
+
+    private function handleSearchConservedPages(WP_Query $query): void
+    {
+        $meta_query = [
+            'relation' => 'AND',
+            [
+                'key' => self::META_KEY,
+                'value' => 'true',
+                'compare' => '='
+            ]
+        ];
+
+        $query->set('suppress_filters', true);
+        $query->set('meta_query', $meta_query);
     }
 }

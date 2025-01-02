@@ -33,6 +33,11 @@ Release tags are created with Semantic versioning in mind. Commit messages were 
 `apply_filters('cp/enqueue/admin-cp.css', $args);`
 - $args (bool) Printing of the file `admin-cp.css` (stylesheet id is `cp/admin-cp.css-css`).
 
+#### - `cp/exclude-pages`
+*Parameters*
+`apply_filters('cp/exclude-pages', $args);`
+- $args (array) The array of IDs of the pages on which checkbox will be hidden. Additionally pages with those IDs and their descendant pages will be excluded from conserving.
+
 ---
 ## Actions
 #### - `cp/init`
@@ -40,6 +45,12 @@ Release tags are created with Semantic versioning in mind. Commit messages were 
 
 #### - `cp/localize/admin-cp.js`
 - Fires right before LEXO Conserve Pages admin script has been enqueued.
+
+#### - `cp/before-conserving-pages`
+- Fires right before pages have been conserved.
+
+#### - `cp/after-conserving-pages`
+- Fires right after pages have been conserved.
 
 ---
 ## Changelog

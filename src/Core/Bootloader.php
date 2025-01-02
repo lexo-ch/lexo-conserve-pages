@@ -19,16 +19,18 @@ class Bootloader extends Singleton
 
     public function run()
     {
+        $converter = (new Conserver());
+
         add_action('init', [$this, 'onInit'], 10);
         add_action(DOMAIN . '/localize/admin-cp.js', [$this, 'onAdminCpJsLoad']);
         add_action('after_setup_theme', [$this, 'onAfterSetupTheme']);
-        add_filter('manage_pages_columns', [$this, 'addConservePageColumn']);
-        add_action('manage_pages_custom_column', [$this, 'displayConservePageCheckbox'], 10, 2);
-        add_action('wp_ajax_toggle_conserve_page', [$this, 'toggleConservePageStatus']);
-        add_action('parse_query', [$this, 'filterConservePageQuery']);
-        add_action('save_post', [$this, 'setConservePageForChild'], 10, 3);
-        add_filter('views_edit-page', [$this, 'filterPageCount'], 10, 1);
-        add_filter('post_class', [$this, 'applyCustomClassToConvertedPages'], 10, 3);
+        add_action('wp_ajax_toggle_conserve_page', [$converter, 'toggleConservePageStatus']);
+        add_action('manage_pages_custom_column', [$converter, 'displayConservePageCheckbox'], 10, 2);
+        add_action('parse_query', [$converter, 'filterConservePageQuery']);
+
+        add_filter('manage_pages_columns', [$converter, 'addConservePageColumn']);
+        add_filter('views_edit-page', [$converter, 'filterPageCount'], 10, 1);
+        add_filter('post_class', [$converter, 'applyCustomClassToConvertedPages'], 10, 3);
     }
 
     public function onInit()
@@ -59,40 +61,5 @@ class Bootloader extends Singleton
     public function loadPluginTextdomain()
     {
         load_plugin_textdomain(DOMAIN, false, trailingslashit(trailingslashit(basename(PATH)) . LOCALES));
-    }
-
-    public function addConservePageColumn($columns)
-    {
-        return Conserver::handleAddConservePageColumn($columns);
-    }
-
-    public function displayConservePageCheckbox($column, $post_id)
-    {
-        Conserver::handleDisplayConservePageCheckbox($column, $post_id);
-    }
-
-    public function toggleConservePageStatus()
-    {
-        Conserver::handleToggleConservePageStatus();
-    }
-
-    public function setConservePageForChild($post_id, $post, $update)
-    {
-        Conserver::handleSetConservePageForChild($post_id, $post, $update);
-    }
-
-    public function filterConservePageQuery($query)
-    {
-        Conserver::handleFilterConservePageQuery($query);
-    }
-
-    public function filterPageCount($views)
-    {
-        return Conserver::handleFilterPageCount($views);
-    }
-
-    public function applyCustomClassToConvertedPages($classes, $class, $post_id)
-    {
-        return Conserver::applyCustomClassToConvertedPages($classes, $class, $post_id);
     }
 }

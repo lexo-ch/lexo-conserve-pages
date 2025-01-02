@@ -47,6 +47,8 @@ const conservePage = (checkbox) => {
         return;
     }
 
+    checkbox.dataset.active = 'true';
+
     const pageList = document.getElementById('the-list');
 
     if (pageList) {
@@ -62,6 +64,11 @@ const conservePage = (checkbox) => {
             location.reload();
         } else if (pageList) {
             pageList.classList.remove('conserve-loading');
+            checkbox.dataset.active = '';
         }
-    }).catch(error => console.error(error));
+    }).catch(error => {
+        pageList.classList.remove('conserve-loading');
+        checkbox.dataset.active = '';
+        console.error(error);
+    });
 };
