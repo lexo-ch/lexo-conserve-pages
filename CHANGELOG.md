@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.1...v1.0.2) (2025-01-02)
+
+
+### Bug Fixes
+
+* **images:** Fix banners ([d7dc5e4](https://github.com/lexo-ch/lexo-conserve-pages/commit/d7dc5e42ea01ed1791c88e3fa4f3d4cfab6f4ee3))
+
 ## [1.0.1](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.0...v1.0.1) (2025-01-02)
 
 
