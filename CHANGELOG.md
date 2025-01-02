@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.3...v1.0.4) (2025-01-02)
+
+
+### Bug Fixes
+
+* **core:** Fix empty Conserved Pages list ([ac72d86](https://github.com/lexo-ch/lexo-conserve-pages/commit/ac72d86d74476c9838bc94857868c337cecb3289))
+
 ## [1.0.3](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.2...v1.0.3) (2025-01-02)
 
 
