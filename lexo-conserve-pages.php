@@ -4,7 +4,7 @@
  * Plugin Name:       LEXO Conserve Pages
  * Plugin URI:        https://github.com/lexo-ch/lexo-conserve-pages/
  * Description:       Groups marked pages.
- * Version:           1.0.2
+ * Version:           1.0.3
  * Requires at least: 4.7
  * Requires PHP:      7.4.1
  * Author:            LEXO GmbH

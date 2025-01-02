@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.2...v1.0.3) (2025-01-02)
+
+
+### Bug Fixes
+
+* **deps:** Update dependencies ([6ae03b9](https://github.com/lexo-ch/lexo-conserve-pages/commit/6ae03b9415b8e4774efa3fa1073a8b0251cabbe5))
+
 ## [1.0.2](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.1...v1.0.2) (2025-01-02)
 
 
