@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.0...v1.0.1) (2025-01-02)
+
+
+### Bug Fixes
+
+* **readme:** Update description ([35f7add](https://github.com/lexo-ch/lexo-conserve-pages/commit/35f7add6e561061af570f4f0bef444aad3106b86))
+
 # 1.0.0 (2025-01-02)
 
 
