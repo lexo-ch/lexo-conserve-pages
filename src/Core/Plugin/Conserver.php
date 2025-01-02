@@ -128,10 +128,7 @@ class Conserver
             isset($_GET['conserved_pages'])
             && $_GET['conserved_pages'] === '1'
         )
-        || (
-            $this->isSearchForConservedPages()
-            && isset($_GET['s'])
-        )
+        || $this->isSearchForConservedPages()
             ? 'current'
             : '';
 
@@ -190,10 +187,6 @@ class Conserver
             return;
         }
 
-        if ($this->isSearchForConservedPages()) {
-            $this->handleSearchConservedPages($query);
-        }
-
         if (
             (
                 isset($_GET['post_type'])
@@ -249,21 +242,9 @@ class Conserver
 
         parse_str($query, $params);
 
-        return isset($params['conserved_pages']) && $params['conserved_pages'] === '1';
-    }
-
-    private function handleSearchConservedPages(WP_Query $query): void
-    {
-        $meta_query = [
-            'relation' => 'AND',
-            [
-                'key' => self::META_KEY,
-                'value' => 'true',
-                'compare' => '='
-            ]
-        ];
-
-        $query->set('suppress_filters', true);
-        $query->set('meta_query', $meta_query);
+        return
+            isset($params['conserved_pages'])
+            && $params['conserved_pages'] === '1'
+            && isset($_GET['s']);
     }
 }
