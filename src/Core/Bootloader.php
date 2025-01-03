@@ -19,18 +19,18 @@ class Bootloader extends Singleton
 
     public function run()
     {
-        $converter = (new Conserver());
+        $conserver = (new Conserver());
 
         add_action('init', [$this, 'onInit'], 10);
         add_action(DOMAIN . '/localize/admin-cp.js', [$this, 'onAdminCpJsLoad']);
         add_action('after_setup_theme', [$this, 'onAfterSetupTheme']);
-        add_action('wp_ajax_toggle_conserve_page', [$converter, 'toggleConservePageStatus']);
-        add_action('manage_pages_custom_column', [$converter, 'displayConservePageCheckbox'], 10, 2);
-        add_action('parse_query', [$converter, 'filterConservePageQuery']);
+        add_action('wp_ajax_toggle_conserve_page', [$conserver, 'toggleConservePageStatus']);
+        add_action('manage_pages_custom_column', [$conserver, 'displayConservePageCheckbox'], 10, 2);
+        add_action('parse_query', [$conserver, 'filterConservePageQuery']);
 
-        add_filter('manage_pages_columns', [$converter, 'addConservePageColumn']);
-        add_filter('views_edit-page', [$converter, 'filterPageCount'], 10, 1);
-        add_filter('post_class', [$converter, 'applyCustomClassToConvertedPages'], 10, 3);
+        add_filter('manage_pages_columns', [$conserver, 'addConservePageColumn']);
+        add_filter('views_edit-page', [$conserver, 'filterPageCount'], 10, 1);
+        add_filter('post_class', [$conserver, 'applyCustomClassToConvertedPages'], 10, 3);
     }
 
     public function onInit()
