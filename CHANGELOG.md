@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.4...v1.0.5) (2025-01-03)
+
+
+### Bug Fixes
+
+* **translations:** Add de_CH, de_CH_informal and de_DE_formal ([5286352](https://github.com/lexo-ch/lexo-conserve-pages/commit/52863526304768c18c8e6412dc1ed6541dc10192))
+
 ## [1.0.4](https://github.com/lexo-ch/lexo-conserve-pages/compare/v1.0.3...v1.0.4) (2025-01-02)
 
 
